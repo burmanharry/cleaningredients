@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Crisp } from "./(lib)/crisp";
 
 export const metadata = {
   title: "CleanIngredients",
@@ -22,7 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Crisp />
+        {children}
+      </body>
     </html>
   );
 }
