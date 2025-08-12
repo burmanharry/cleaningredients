@@ -32,8 +32,10 @@ export default function Home() {
     </main>
   );
 }if (j.ok) {
-  (window as any).plausible?.("JoinWaitlist");
+  (window as any).plausible?.("JoinWaitlist", { props: { source: "homepage" } });
   setEmail("");
+}
+
 }
 
 
