@@ -11,9 +11,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           defer
-          data-domain="cleaningredients-git-main-cleaningredients-projects.vercel.app"
+          data-domain="cleaningredients.vercel.app"
           src="https://plausible.io/js/script.file-downloads.outbound-links.revenue.tagged-events.js"
         ></script>
+        <script
+          id="plausible-init"
+          dangerouslySetInnerHTML={{
+            __html:
+              'window.plausible = window.plausible || function(){(window.plausible.q = window.plausible.q || []).push(arguments)}',
+          }}
+        />
       </head>
       <body>{children}</body>
     </html>
