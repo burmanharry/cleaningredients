@@ -1,13 +1,3 @@
-export default function Home() {
-  return (
-    <main className="p-8">
-      <h1 className="text-4xl font-bold text-blue-600">
-        Tailwind is working!
-      </h1>
-      <p className="mt-4 text-gray-600">Next.js + Tailwind v4</p>
-    </main>
-  );
-}
 "use client";
 import { useState } from "react";
 
