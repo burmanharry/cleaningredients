@@ -31,5 +31,9 @@ export default function Home() {
       {msg && <p className="mt-3 text-sm text-gray-600">{msg}</p>}
     </main>
   );
+}if (j.ok) {
+  (window as any).plausible?.("JoinWaitlist");
+  setEmail("");
 }
+
 
