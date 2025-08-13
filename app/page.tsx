@@ -45,4 +45,7 @@ export default function Home() {
           Join
         </button>
       </form>
-      {msg && <p className="mt-3 text-sm text-gray-600">{
+      {msg && <p className="mt-3 text-sm text-gray-600">{msg}</p>}
+    </main>
+  );
+}
