@@ -170,10 +170,10 @@ export default function Home() {
 
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
          {[
-           { name: "Antioxidants", img: "antioxidants", label: "Antioxidant" },
-           { name: "Adaptogens",  img: "adaptogens",  label: "Adaptogen"  },
-           { name: "Nootropics",  img: "nootropics",  label: "Nootropic"  },
-           { name: "Longevity",   img: "longevity",   label: "Longevity"  },
+       { name: "Antioxidants", img: "antioxidants", label: "Antioxidant" as const },
+{ name: "Adaptogens",  img: "adaptogens",  label: "Adaptogen" as const },
+{ name: "Nootropics",  img: "nootropics",  label: "Nootropic" as const },
+{ name: "Longevity",   img: "longevity",   label: "Longevity" as const },
          ].map((cat) => (
            <Link
              key={cat.name}
