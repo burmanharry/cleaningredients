@@ -1,3 +1,29 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Base */
+@layer base {
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+  html, body { height: 100%; }
+  body { @apply bg-white text-gray-900 antialiased; }
+}
+
+/* Components */
+@layer components {
+  .btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium; }
+  .btn-primary { @apply bg-black text-white hover:opacity-90; }
+  .container-page { @apply mx-auto max-w-4xl px-6 py-8; }
+
+  /* Article refinements (used by prose) */
+  .prose { @apply leading-7 text-neutral-800; }
+  .prose :where(h1,h2,h3){ scroll-margin-top: 6rem; }
+  .prose h1 { @apply text-4xl font-semibold tracking-tight mb-2; }
+  .prose h2 { @apply mt-10 text-2xl font-semibold; }
+  .prose h3 { @apply mt-8 text-xl font-semibold; }
+  .prose a  { @apply text-neutral-900 underline underline-offset-4 hover:no-underline; }
+  .prose code { @apply rounded bg-neutral-100 px-1.5 py-0.5; }
+}
+/* Updated Wed Sep 10 11:21:52 PDT 2025 */
