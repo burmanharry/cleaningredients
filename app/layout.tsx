@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Crisp } from "./(lib)/crisp";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "CleanIngredients",
