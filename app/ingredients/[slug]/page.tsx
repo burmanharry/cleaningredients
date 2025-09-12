@@ -1,3 +1,4 @@
+// app/ingredients/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import ImageGallery from "@/components/ImageGallery";
@@ -5,17 +6,14 @@ import BuyBox from "@/components/BuyBox";
 import SpecTable from "@/components/SpecTable";
 
 const PLACEHOLDER_PRICE = 10; // temp price per kg
-export function IngredientsAlias(props: { params: { slug: string } }) {
-  return IngredientPage(props); // or just remove this alias entirely
-}
 
 export const revalidate = 300;
 
-export default async function IngredientPage({
-  params,
-}: { params: { slug: string } }) 
-{
-  const slug = decodeURIComponent(params.slug);
+export default async function IngredientPage(
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -71,7 +69,7 @@ export default async function IngredientPage({
 
   const specPairs: [string, string][] = rawSpecs
     ? (ORDER.map(([key, label]) => {
-        const v = rawSpecs[key];
+        const v = rawSpecs[key as string];
         if (v == null || String(v).trim() === "") return null;
         return [label, String(v)] as [string, string];
       }).filter(Boolean) as [string, string][])

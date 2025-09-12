@@ -1,25 +1,34 @@
 // app/information/[slug]/page.tsx
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ARTICLES } from "@/content/articles";
 
-export async function generateStaticParams() {
+export function generateStaticParams(): Array<{ slug: string }> {
   return ARTICLES.map((a) => ({ slug: a.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const article = ARTICLES.find((a) => a.slug === params.slug);
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const article = ARTICLES.find((a) => a.slug === slug);
+
   return {
-    title: article ? `${article.title} • CleanIngredients` : "Information • CleanIngredients",
+    title: article
+      ? `${article.title} • CleanIngredients`
+      : "Information • CleanIngredients",
     description: article
       ? `Learn about ${article.title.replace(/\.$/, "")} — ${article.tag}.`
       : "Information articles.",
   };
 }
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const article = ARTICLES.find((a) => a.slug === params.slug);
+export default async function ArticlePage(
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
+  const article = ARTICLES.find((a) => a.slug === slug);
   if (!article) notFound();
 
   return (
@@ -30,7 +39,9 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
         <span>{article.category}</span>
       </div>
 
-      <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight">{article.title}</h1>
+      <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight">
+        {article.title}
+      </h1>
 
       <div className="mt-3 flex items-center gap-2">
         <span className="inline-flex items-center rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs font-medium text-neutral-700">
@@ -38,7 +49,6 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
         </span>
       </div>
 
-      {/* Placeholder body — swap with real content later */}
       <div className="prose prose-neutral mt-8 max-w-none">
         <p>
           Full article coming soon. This topic falls under <strong>{article.category}</strong>

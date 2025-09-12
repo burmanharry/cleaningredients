@@ -27,10 +27,6 @@ function priceLabel(row: Row) {
 
 /** ---------------- Config / constants ---------------- */
 
-export function IngredientsAlias(props: { params: { slug: string } }) {
-  return IngredientPage(props); // optional alias; or remove this function
-}
-
 const VIEW = "ingredient_stats_plus"; // change if you switch views/tables
 
 // Keep selected fields in one place
@@ -487,7 +483,3 @@ export default async function IngredientsPage({
   );
 }
 
-// Optional alias target; safe to keep if used elsewhere
-async function IngredientPage(_: { params: { slug: string } }) {
-  return null;
-}
