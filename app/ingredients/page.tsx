@@ -105,7 +105,11 @@ function paramsWith(sp: SearchParams, extra: Record<string, string>): Record<str
 }
 
 /** Build an href by merging current params and deleting some (like page). */
-function buildHref(sp: SearchParams, extra: Record<string, string | null>, drop: string[] = ["page"]) {
+function buildHref(
+  sp: SearchParams,
+  extra: Record<string, string | null>,
+  drop: string[] = ["page"]
+) {
   const qs = new URLSearchParams(paramsWithout(sp, drop));
   for (const [k, v] of Object.entries(extra)) {
     if (v == null || v === "") qs.delete(k);
@@ -222,6 +226,7 @@ export default async function IngredientsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
+  const spTyped = sp as SearchParams;
 
   // Parse params from `sp`
   const q = parseString(sp.q);
@@ -232,8 +237,11 @@ export default async function IngredientsPage({
   const max$ = parseNumber(sp.max);
   const sort = (parseString(sp.sort) || "popularity") as SortKey;
 
-  const page = clampPage(parseNumber(sp.page));
-  const limit = clampLimit(parseNumber(sp.limit));
+  // Pagination (rename to avoid 'from' shadowing and runtime collisions)
+  const pageNum = clampPage(parseNumber(sp.page));
+  const limitNum = clampLimit(parseNumber(sp.limit));
+  const rangeFrom = (pageNum - 1) * limitNum;
+  const rangeTo = rangeFrom + limitNum - 1;
 
   // Fetch
   const { rows, total } = await fetchIngredients({
@@ -244,12 +252,12 @@ export default async function IngredientsPage({
     min: min$,
     max: max$,
     sort,
-    from,
-    to,
+    from: rangeFrom,
+    to: rangeTo,
   });
 
-  const showFrom = rows.length > 0 ? from + 1 : 0;
-  const showTo = from + rows.length;
+  const showFrom = rows.length > 0 ? rangeFrom + 1 : 0;
+  const showTo = rangeFrom + rows.length;
 
   return (
     <main className="mx-auto max-w-6xl px-4 pt-6 grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8">
@@ -261,7 +269,7 @@ export default async function IngredientsPage({
           <ul className="mt-2 space-y-2">
             <li>
               <Link
-                href={buildHref(sp, { category: null })}
+                href={buildHref(spTyped, { category: null })}
                 className={!category ? "font-semibold underline" : "hover:underline"}
               >
                 All
@@ -270,7 +278,7 @@ export default async function IngredientsPage({
             {CATEGORIES.map((c) => (
               <li key={c}>
                 <Link
-                  href={buildHref(sp, { category: c })}
+                  href={buildHref(spTyped, { category: c })}
                   className={category === c ? "font-semibold underline" : "hover:underline"}
                 >
                   {c}
@@ -286,7 +294,7 @@ export default async function IngredientsPage({
           <ul className="mt-2 space-y-2">
             <li>
               <Link
-                href={buildHref(sp, { source: null })}
+                href={buildHref(spTyped, { source: null })}
                 className={!source ? "font-semibold underline" : "hover:underline"}
               >
                 All
@@ -295,7 +303,7 @@ export default async function IngredientsPage({
             {SOURCES.map((s) => (
               <li key={s}>
                 <Link
-                  href={buildHref(sp, { source: s })}
+                  href={buildHref(spTyped, { source: s })}
                   className={source === s ? "font-semibold underline" : "hover:underline"}
                 >
                   {s}
@@ -385,81 +393,79 @@ export default async function IngredientsPage({
         <div className="border-t border-black/15 mb-4" />
 
         {/* Results header */}
-<p className="mb-3 text-sm text-neutral-600">
-  {total === 0 ? "No results" : `Showing ${showFrom}–${showTo} of ${total} results`}
-</p>
+        <p className="mb-3 text-sm text-neutral-600">
+          {total === 0 ? "No results" : `Showing ${showFrom}–${showTo} of ${total} results`}
+        </p>
 
-{/* Results grid */}
-<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-10">
-  {rows.map((r) => {
-    const href = `/ingredients/${encodeURIComponent(r.slug)}`;
-    const img = resolveImage(r);
+        {/* Results grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-10">
+          {rows.map((r) => {
+            const href = `/ingredients/${encodeURIComponent(r.slug)}`;
+            const img = resolveImage(r);
 
-    return (
-      <Link
-        key={r.id}
-        href={href}
-        className="group rounded-2xl border border-black/20 bg-white shadow-sm overflow-hidden"
-      >
-        <div className="relative aspect-[1/1] bg-neutral-100">
-          <Image
-            src={img}
-            alt={r.name}
-            fill
-            sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          />
-          {r.has_verified ? (
-            <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-medium ring-1 ring-black/10">
-              Verified
-            </span>
-          ) : null}
+            return (
+              <Link
+                key={r.id}
+                href={href}
+                className="group rounded-2xl border border-black/20 bg-white shadow-sm overflow-hidden"
+              >
+                <div className="relative aspect-[1/1] bg-neutral-100">
+                  <Image
+                    src={img}
+                    alt={r.name}
+                    fill
+                    sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                  {r.has_verified ? (
+                    <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-medium ring-1 ring-black/10">
+                      Verified
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="font-medium">{r.name}</h3>
+                    <span className="shrink-0 rounded-full border border-black/10 bg-neutral-50 px-2 py-0.5 text-xs">
+                      {r.category || r.source_type || "—"}
+                    </span>
+                  </div>
+
+                  <div className="mt-1 text-xs text-neutral-500">{r.source_type || "—"}</div>
+
+                  <div className="mt-2 text-sm">
+                    {r.min_price != null ? (
+                      <>
+                        From{" "}
+                        <span className="font-semibold">
+                          ${Number(r.min_price).toFixed(2)}
+                        </span>
+                        <span className="text-neutral-500"> / kg</span>
+                      </>
+                    ) : (
+                      <>
+                        From{" "}
+                        <span className="font-semibold">
+                          ${PLACEHOLDER_USD_PER_KG.toFixed(2)}
+                        </span>
+                        <span className="text-neutral-500"> / kg (indicative)</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
-
-        <div className="p-4">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="font-medium">{r.name}</h3>
-            <span className="shrink-0 rounded-full border border-black/10 bg-neutral-50 px-2 py-0.5 text-xs">
-              {r.category || r.source_type || "—"}
-            </span>
-          </div>
-
-          <div className="mt-1 text-xs text-neutral-500">{r.source_type || "—"}</div>
-
-          <div className="mt-2 text-sm">
-            {r.min_price != null ? (
-              <>
-                From{" "}
-                <span className="font-semibold">
-                  ${Number(r.min_price).toFixed(2)}
-                </span>
-                <span className="text-neutral-500"> / kg</span>
-              </>
-            ) : (
-              <>
-                From{" "}
-                <span className="font-semibold">
-                  ${PLACEHOLDER_USD_PER_KG.toFixed(2)}
-                </span>
-                <span className="text-neutral-500"> / kg (indicative)</span>
-              </>
-            )}
-          </div>
-        </div>
-      </Link>
-    );
-  })}
-</div>
-
-
 
         {/* Pagination */}
-        {total > limit && (
+        {total > limitNum && (
           <div className="mt-8 flex items-center justify-center gap-3">
-            {page > 1 && (
+            {pageNum > 1 && (
               <Link
                 href={`/ingredients?${new URLSearchParams({
-                  ...paramsWith(sp, { page: String(page - 1) }),
+                  ...paramsWith(spTyped, { page: String(pageNum - 1) }),
                 }).toString()}`}
                 className="rounded-xl border border-black/10 px-4 py-2"
               >
@@ -469,7 +475,7 @@ export default async function IngredientsPage({
             {showTo < total && (
               <Link
                 href={`/ingredients?${new URLSearchParams({
-                  ...paramsWith(sp, { page: String(page + 1) }),
+                  ...paramsWith(spTyped, { page: String(pageNum + 1) }),
                 }).toString()}`}
                 className="rounded-xl border border-black/10 px-4 py-2"
               >
@@ -482,4 +488,3 @@ export default async function IngredientsPage({
     </main>
   );
 }
-
