@@ -7,17 +7,9 @@ import Pagination from "@/components/Pagination";
 
 export const revalidate = 300;
 
-type SearchParams = {
-  q?: string;
-  category?: string;      // display label (e.g., "Adaptogen")
-  source?: string;        // "Botanicals" | "Mushrooms" | ""
-  verified?: string;      // "1"
-  min?: string;           // dollars
-  max?: string;           // dollars
-  sort?: string;          // "popularity" | "price_asc" | "price_desc"
-  page?: string;          // 1-based
-  limit?: string;         // default 12
-};
+// Collapse string | string[] | undefined to a single string
+const first = (v: string | string[] | undefined, fallback = "") =>
+  (Array.isArray(v) ? v[0] : v) ?? fallback;
 
 export default async function BrowsePage({
   searchParams,
@@ -26,6 +18,7 @@ export default async function BrowsePage({
 }) {
   const sp = await searchParams;
 
+  // Raw (possibly string[]) with defaults
   const {
     q = "",
     category = "",
@@ -36,12 +29,23 @@ export default async function BrowsePage({
     sort = "popularity",
     page = "1",
     limit = "12",
-  } = sp;
+  } = sp ?? {};
 
-  const pageNum = Math.max(1, parseInt(page || "1", 10));
-  const pageSize = Math.min(48, Math.max(1, parseInt(limit || "12", 10)));
+  // Normalize to plain strings
+  const qStr        = first(q, "");
+  const categoryStr = first(category, "");
+  const sourceStr   = first(source, "");
+  const verifiedStr = first(verified, "");
+  const minStr      = first(min, "");
+  const maxStr      = first(max, "");
+  const sortStr     = first(sort, "popularity");
+  const pageStr     = first(page, "1");
+  const limitStr    = first(limit, "12");
+
+  const pageNum  = Math.max(1, parseInt(pageStr, 10));
+  const pageSize = Math.min(48, Math.max(1, parseInt(limitStr, 10)));
   const from = (pageNum - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const to   = from + pageSize - 1;
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -56,17 +60,14 @@ export default async function BrowsePage({
       { count: "exact" }
     );
 
-  if (q) {
-    // simple search on name + description
-    query = query.ilike("name", `%${q}%`);
-  }
-  if (category) query = query.eq("category", category);
-  if (source) query = query.eq("source_type", source);
-  if (verified === "1") query = query.eq("has_verified", true);
-  if (min) query = query.gte("min_price", Number(min) * 100);
-  if (max) query = query.lte("min_price", Number(max) * 100);
+  if (qStr) query = query.ilike("name", `%${qStr}%`);
+  if (categoryStr) query = query.eq("category", categoryStr);
+  if (sourceStr) query = query.eq("source_type", sourceStr);
+  if (verifiedStr === "1") query = query.eq("has_verified", true);
+  if (minStr) query = query.gte("min_price", Number(minStr) * 100);
+  if (maxStr) query = query.lte("min_price", Number(maxStr) * 100);
 
-  switch (sort) {
+  switch (sortStr) {
     case "price_asc":
       query = query.order("min_price", { ascending: true, nullsFirst: false });
       break;
@@ -79,19 +80,36 @@ export default async function BrowsePage({
   }
 
   const { data: rows, count, error } = await query.range(from, to);
-  if (error) {
-    console.error(error);
-  }
+  if (error) console.error(error);
 
-  // Facets (basic, fast): pull distincts for sidebar
+  // Facets (basic, fast)
   const [{ data: fcats }, { data: fsrcs }] = await Promise.all([
-    supabase.from("ingredient_stats_plus").select("category").neq("category", "").then(r => ({ data: [...new Set((r.data ?? []).map(x => x.category))].sort() })),
-    supabase.from("ingredient_stats_plus").select("source_type").neq("source_type", "").then(r => ({ data: [...new Set((r.data ?? []).map(x => x.source_type))].sort() })),
+    supabase
+      .from("ingredient_stats_plus")
+      .select("category")
+      .neq("category", "")
+      .then((r) => ({ data: [...new Set((r.data ?? []).map((x: any) => x.category))].sort() })),
+    supabase
+      .from("ingredient_stats_plus")
+      .select("source_type")
+      .neq("source_type", "")
+      .then((r) => ({ data: [...new Set((r.data ?? []).map((x: any) => x.source_type))].sort() })),
   ]);
 
   const facets = {
     categories: (fcats as string[]) ?? [],
     sources: (fsrcs as string[]) ?? [],
+  };
+
+  // Normalized params for components that might rebuild URLs
+  const spNorm: Record<string, string> = {
+    ...(qStr ? { q: qStr } : {}),
+    ...(categoryStr ? { category: categoryStr } : {}),
+    ...(sourceStr ? { source: sourceStr } : {}),
+    ...(verifiedStr ? { verified: verifiedStr } : {}),
+    ...(minStr ? { min: minStr } : {}),
+    ...(maxStr ? { max: maxStr } : {}),
+    ...(sortStr ? { sort: sortStr } : {}),
   };
 
   return (
@@ -103,7 +121,7 @@ export default async function BrowsePage({
             <FiltersPanel
               categories={facets.categories}
               sources={facets.sources}
-              active={{ category, source }}
+              active={{ category: categoryStr, source: sourceStr }}
             />
           </div>
         </aside>
@@ -111,12 +129,12 @@ export default async function BrowsePage({
         {/* Right: toolbar + grid */}
         <section className="lg:col-span-9">
           <ResultsToolbar
-            q={q}
-            category={category}
-            verified={verified === "1"}
-            min={min}
-            max={max}
-            sort={sort}
+            q={qStr}
+            category={categoryStr}
+            verified={verifiedStr === "1"}
+            min={minStr}
+            max={maxStr}
+            sort={sortStr}
           />
 
           {/* Count */}
@@ -126,11 +144,9 @@ export default async function BrowsePage({
 
           {/* Grid */}
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(rows ?? []).map((row) => (
-              <IngredientCard key={row.id} item={row} />
-            ))}
+            {(rows ?? []).map((row) => <IngredientCard key={row.id} item={row} />)}
 
-            {/* Skeletons (loading state / empty placeholders) */}
+            {/* Skeletons */}
             {(!rows || rows.length === 0) && (
               <>
                 {[...Array(6)].map((_, i) => (
@@ -149,7 +165,7 @@ export default async function BrowsePage({
             page={pageNum}
             limit={pageSize}
             pathname="/browse"
-            searchParams={sp}
+            searchParams={spNorm}
           />
         </section>
       </div>
