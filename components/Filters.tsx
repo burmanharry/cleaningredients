@@ -1,7 +1,6 @@
 "use client";
-
-import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import * as React from "react";
 
 type Props = {
   initialSearchParams?: Record<string, string | string[] | undefined>;
