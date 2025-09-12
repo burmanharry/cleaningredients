@@ -1,3 +1,38 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ---- Safe, plain CSS below (no nesting or JS) ---- */
+
+:root {
+  color-scheme: light;
+  --radius: 12px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #fff;
+  color: #0a0a0a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg, video, canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
