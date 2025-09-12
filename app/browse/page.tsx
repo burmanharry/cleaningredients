@@ -22,8 +22,10 @@ type SearchParams = {
 export default async function BrowsePage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const sp = await searchParams;
+
   const {
     q = "",
     category = "",
@@ -34,7 +36,7 @@ export default async function BrowsePage({
     sort = "popularity",
     page = "1",
     limit = "12",
-  } = searchParams || {};
+  } = sp;
 
   const pageNum = Math.max(1, parseInt(page || "1", 10));
   const pageSize = Math.min(48, Math.max(1, parseInt(limit || "12", 10)));
@@ -147,7 +149,7 @@ export default async function BrowsePage({
             page={pageNum}
             limit={pageSize}
             pathname="/browse"
-            searchParams={searchParams}
+            searchParams={sp}
           />
         </section>
       </div>

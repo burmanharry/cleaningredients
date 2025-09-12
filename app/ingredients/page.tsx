@@ -223,21 +223,21 @@ async function fetchIngredients(opts: {
 export default async function IngredientsPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  // Parse URL params
-  const q = parseString(searchParams.q);
-  const category = parseString(searchParams.category);
-  const source = parseString(searchParams.source);
-  const verifiedOnly = parseBool(searchParams.verified);
-  const min$ = parseNumber(searchParams.min);
-  const max$ = parseNumber(searchParams.max);
-  const sort = (parseString(searchParams.sort) || "popularity") as SortKey;
+  const sp = await searchParams;
 
-  const page = clampPage(parseNumber(searchParams.page));
-  const limit = clampLimit(parseNumber(searchParams.limit));
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
+  // Parse params from `sp`
+  const q = parseString(sp.q);
+  const category = parseString(sp.category);
+  const source = parseString(sp.source);
+  const verifiedOnly = parseBool(sp.verified);
+  const min$ = parseNumber(sp.min);
+  const max$ = parseNumber(sp.max);
+  const sort = (parseString(sp.sort) || "popularity") as SortKey;
+
+  const page = clampPage(parseNumber(sp.page));
+  const limit = clampLimit(parseNumber(sp.limit));
 
   // Fetch
   const { rows, total } = await fetchIngredients({
@@ -265,7 +265,7 @@ export default async function IngredientsPage({
           <ul className="mt-2 space-y-2">
             <li>
               <Link
-                href={buildHref(searchParams, { category: null })}
+                href={buildHref(sp, { category: null })}
                 className={!category ? "font-semibold underline" : "hover:underline"}
               >
                 All
@@ -274,7 +274,7 @@ export default async function IngredientsPage({
             {CATEGORIES.map((c) => (
               <li key={c}>
                 <Link
-                  href={buildHref(searchParams, { category: c })}
+                  href={buildHref(sp, { category: c })}
                   className={category === c ? "font-semibold underline" : "hover:underline"}
                 >
                   {c}
@@ -290,7 +290,7 @@ export default async function IngredientsPage({
           <ul className="mt-2 space-y-2">
             <li>
               <Link
-                href={buildHref(searchParams, { source: null })}
+                href={buildHref(sp, { source: null })}
                 className={!source ? "font-semibold underline" : "hover:underline"}
               >
                 All
@@ -299,7 +299,7 @@ export default async function IngredientsPage({
             {SOURCES.map((s) => (
               <li key={s}>
                 <Link
-                  href={buildHref(searchParams, { source: s })}
+                  href={buildHref(sp, { source: s })}
                   className={source === s ? "font-semibold underline" : "hover:underline"}
                 >
                   {s}
@@ -463,7 +463,7 @@ export default async function IngredientsPage({
             {page > 1 && (
               <Link
                 href={`/ingredients?${new URLSearchParams({
-                  ...paramsWith(searchParams, { page: String(page - 1) }),
+                  ...paramsWith(sp, { page: String(page - 1) }),
                 }).toString()}`}
                 className="rounded-xl border border-black/10 px-4 py-2"
               >
@@ -473,7 +473,7 @@ export default async function IngredientsPage({
             {showTo < total && (
               <Link
                 href={`/ingredients?${new URLSearchParams({
-                  ...paramsWith(searchParams, { page: String(page + 1) }),
+                  ...paramsWith(sp, { page: String(page + 1) }),
                 }).toString()}`}
                 className="rounded-xl border border-black/10 px-4 py-2"
               >
