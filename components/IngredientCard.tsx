@@ -13,6 +13,8 @@ type Item = {
   min_price?: number | null;
 };
 
+export type IngredientTile = Item;
+
 export default function IngredientCard({ item }: { item: Item }) {
   const href  = `/ingredients/${encodeURIComponent(item.slug)}`;
   const image = item.image_url || `/images/ingredients/${item.slug}.jpg`;
