@@ -1,6 +1,5 @@
 // components/ResultsToolbar.tsx
 "use client";
-
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function ResultsToolbar({
