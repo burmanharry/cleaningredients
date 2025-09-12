@@ -5,17 +5,26 @@ import HowItWorks from "@/components/HowItWorks";
 import WhatYouGet from "@/components/WhatYouGet";
 import { Microscope, ShieldCheck, FlaskConical } from "lucide-react";
 
-// helper to build the /ingredients URL with the correct category
-function catHref(label: "Antioxidant" | "Adaptogen" | "Nootropic" | "Longevity") {
+// ----- Types & helpers -----
+type CategoryLabel = "Antioxidant" | "Adaptogen" | "Nootropic" | "Longevity";
+
+function catHref(label: CategoryLabel) {
   const qs = new URLSearchParams({
     sort: "popularity",
     limit: "12",
-    category: label, // your /ingredients page expects the display label
+    category: label,
     source: "",
     page: "1",
   });
   return `/ingredients?${qs.toString()}`;
 }
+
+const CATS = [
+  { name: "Antioxidants", img: "antioxidants", label: "Antioxidant" as const },
+  { name: "Adaptogens",  img: "adaptogens",  label: "Adaptogen"  as const },
+  { name: "Nootropics",  img: "nootropics",  label: "Nootropic"  as const },
+  { name: "Longevity",   img: "longevity",   label: "Longevity"  as const },
+] as const;
 
 export default function Home() {
   return (
@@ -158,12 +167,7 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { name: "Antioxidants", img: "antioxidants", label: "Antioxidant" },
-            { name: "Adaptogens",  img: "adaptogens",  label: "Adaptogen"  },
-            { name: "Nootropics",  img: "nootropics",  label: "Nootropic"  },
-            { name: "Longevity",   img: "longevity",   label: "Longevity"  },
-          ].map((cat) => (
+          {CATS.map((cat) => (
             <Link
               key={cat.name}
               href={catHref(cat.label)}
