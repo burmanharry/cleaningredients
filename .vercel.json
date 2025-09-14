@@ -1,0 +1,3 @@
+"crons": [
+{ "path": "/api/workers/drain-queue", "schedule": "*/1 * * * *" }
+]
