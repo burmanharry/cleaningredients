@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "generate:info": "tsx scripts/generate-info-mdx.ts",
-    "generate:pillars": "tsx scripts/generate-category-pillars.ts"
-},
+    "generate:pillars": "tsx scripts/generate-category-pillars.ts",
+    "scaffold:content": "tsx scripts/scaffold-content.ts"
+  },
   "dependencies": {
     "@next/mdx": "^15.5.3",
     "@supabase/ssr": "^0.7.0",
