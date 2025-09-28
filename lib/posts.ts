@@ -6,7 +6,6 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { MDXComponents } from "@/components/MDXComponents";
 
 const ROOT = path.join(process.cwd(), "content", "information");
 const CAT_ROOT = path.join(process.cwd(), "content", "categories");
@@ -18,16 +17,13 @@ export type PostMeta = {
   category?: string;
   tags?: string[];
   updatedAt?: string; // ISO
-  author?: string;    // ✅ capture author
-  image?: string;     // ✅ capture OG image
+  author?: string;
+  image?: string;
   faqs?: { q: string; a: string }[];
   howto?: { name?: string; steps?: string[] };
 };
 
-// ---------------------
-// Listing & reading
-// ---------------------
-
+// ---------- Listing ----------
 export async function listPostSlugs(): Promise<string[]> {
   const entries = await fs.readdir(ROOT, { withFileTypes: true });
   return entries
@@ -53,10 +49,12 @@ export async function listPosts(): Promise<PostMeta[]> {
       category: frontmatter.category ?? "General",
       tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
       updatedAt: frontmatter.updatedAt ?? "",
-      author: (frontmatter as any).author ?? "",   // ✅
-      image:  (frontmatter as any).image  ?? "",   // ✅
-      faqs:   Array.isArray((frontmatter as any).faqs) ? (frontmatter as any).faqs : [],
-      howto:  (frontmatter as any).howto ?? {},
+      author: (frontmatter as any).author ?? "",
+      image: (frontmatter as any).image ?? "",
+      faqs: Array.isArray((frontmatter as any).faqs)
+        ? (frontmatter as any).faqs
+        : [],
+      howto: (frontmatter as any).howto ?? {},
     });
   }
 
@@ -64,20 +62,25 @@ export async function listPosts(): Promise<PostMeta[]> {
   return rows;
 }
 
-export async function getPost(slug: string): Promise<{ meta: PostMeta; Content: ReactElement }> {
+// ---------- Single Post ----------
+export async function getPost(
+  slug: string
+): Promise<{ meta: PostMeta; Content: ReactElement }> {
   const filePath = path.join(ROOT, `${slug}.mdx`);
   const source = await fs.readFile(filePath, "utf8");
 
   const { content, frontmatter } = await compileMDX<PostMeta>({
     source,
-    components: MDXComponents, // ✅ pass the object; do NOT call
     options: {
       parseFrontmatter: true,
       mdxOptions: {
         remarkPlugins: [remarkGfm],
         rehypePlugins: [
           rehypeSlug,
-          [rehypeAutolinkHeadings, { behavior: "wrap", properties: { className: "no-underline" } }],
+          [
+            rehypeAutolinkHeadings,
+            { behavior: "wrap", properties: { className: "no-underline" } },
+          ],
         ],
       },
     },
@@ -90,26 +93,29 @@ export async function getPost(slug: string): Promise<{ meta: PostMeta; Content: 
     category: frontmatter.category ?? "General",
     tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
     updatedAt: frontmatter.updatedAt ?? "",
-    author: (frontmatter as any).author ?? "",   // ✅
-    image:  (frontmatter as any).image  ?? "",   // ✅
-    faqs:   Array.isArray((frontmatter as any).faqs) ? (frontmatter as any).faqs : [],
-    howto:  (frontmatter as any).howto ?? {},
+    author: (frontmatter as any).author ?? "",
+    image: (frontmatter as any).image ?? "",
+    faqs: Array.isArray((frontmatter as any).faqs)
+      ? (frontmatter as any).faqs
+      : [],
+    howto: (frontmatter as any).howto ?? {},
   };
 
   return { meta, Content: content };
 }
 
-// ---------------------
-// Related posts (scored)
-// ---------------------
-
-export async function getRelatedPosts(currentSlug: string, limit = 3): Promise<PostMeta[]> {
+// ---------- Related ----------
+export async function getRelatedPosts(
+  currentSlug: string,
+  limit = 3
+): Promise<PostMeta[]> {
   const all = await listPosts();
   const current = all.find((p) => p.slug === currentSlug);
   if (!current) return all.slice(0, limit);
 
   const toSet = (a?: string[]) => new Set((a ?? []).map((s) => s.toLowerCase()));
-  const words = (s = "") => new Set(s.toLowerCase().split(/\W+/).filter((w) => w.length > 3));
+  const words = (s = "") =>
+    new Set(s.toLowerCase().split(/\W+/).filter((w) => w.length > 3));
 
   const currentTags = toSet(current.tags);
   const currentWords = words(current.title ?? "");
@@ -121,7 +127,9 @@ export async function getRelatedPosts(currentSlug: string, limit = 3): Promise<P
       if (p.category === current.category) score += 3;
       const t = toSet(p.tags);
       for (const tag of t) if (currentTags.has(tag)) score += 2;
-      const overlap = [...words(p.title ?? "")].filter((w) => currentWords.has(w)).length;
+      const overlap = [...words(p.title ?? "")].filter((w) =>
+        currentWords.has(w)
+      ).length;
       score += Math.min(overlap, 3);
       return { p, score };
     })
@@ -134,13 +142,12 @@ export async function getRelatedPosts(currentSlug: string, limit = 3): Promise<P
     .slice(0, limit)
     .map((x) => x.p);
 
-  return scored.length ? scored : all.filter((p) => p.slug !== currentSlug).slice(0, limit);
+  return scored.length
+    ? scored
+    : all.filter((p) => p.slug !== currentSlug).slice(0, limit);
 }
 
-// ---------------------
-// Categories (optional)
-// ---------------------
-
+// ---------- Categories ----------
 export function categorySlugify(name: string) {
   return name
     .toLowerCase()
@@ -164,11 +171,18 @@ export async function listCategories(): Promise<
   }
 
   return Array.from(map.entries())
-    .map(([name, v]) => ({ name, slug: categorySlugify(name), count: v.count, latest: v.latest }))
+    .map(([name, v]) => ({
+      name,
+      slug: categorySlugify(name),
+      count: v.count,
+      latest: v.latest,
+    }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getCategoryPosts(name: string): Promise<PostMeta[]> {
+export async function getCategoryPosts(
+  name: string
+): Promise<PostMeta[]> {
   const posts = await listPosts();
   return posts
     .filter((p) => (p.category?.trim() || "General") === name)
@@ -185,7 +199,6 @@ export async function getCategoryIntro(
 
     const { content, frontmatter } = await compileMDX({
       source,
-      components: MDXComponents, // ✅ default import again
       options: { parseFrontmatter: true },
     });
 
