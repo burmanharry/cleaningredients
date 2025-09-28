@@ -6,6 +6,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { MDXComponents } from "@/components/MDXComponents";
 
 const ROOT = path.join(process.cwd(), "content", "information");
 const CAT_ROOT = path.join(process.cwd(), "content", "categories");
@@ -39,6 +40,7 @@ export async function listPosts(): Promise<PostMeta[]> {
     const source = await fs.readFile(path.join(ROOT, `${slug}.mdx`), "utf8");
     const { frontmatter } = await compileMDX<PostMeta>({
       source,
+      components: MDXComponents,
       options: { parseFrontmatter: true },
     });
 
@@ -71,6 +73,7 @@ export async function getPost(
 
   const { content, frontmatter } = await compileMDX<PostMeta>({
     source,
+    components: MDXComponents,
     options: {
       parseFrontmatter: true,
       mdxOptions: {
@@ -199,6 +202,7 @@ export async function getCategoryIntro(
 
     const { content, frontmatter } = await compileMDX({
       source,
+      components: MDXComponents,
       options: { parseFrontmatter: true },
     });
 
