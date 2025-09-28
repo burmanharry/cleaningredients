@@ -6,7 +6,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import MDXComponents from "@/components/MDXComponents"; // ✅ default import
+import { MDXComponents } from "@/components/MDXComponents";
 
 const ROOT = path.join(process.cwd(), "content", "information");
 const CAT_ROOT = path.join(process.cwd(), "content", "categories");
