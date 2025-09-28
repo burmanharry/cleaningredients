@@ -1,43 +1,83 @@
 ---
-title: "Common ingredient fraud cases (dilution, substitution)."
-description: "Common ingredient fraud cases (dilution, substitution). — practical definitions, checklists, and what to ask suppliers."
-category: "Buyer Risk & Protection"
-tags: []
-author: "harry-burman"         # 👈 matches key in AUTHORS
+title: "Common Ingredient Fraud Cases: Dilution & Substitution"
+description: "How dilution, substitution, and mislabeling happen — and the practical checks that catch them before they cost you."
+category: "Verification & Trust"
+tags: ["verification", "fraud", "quality", "evergreen"]
+author: "harry"
 image: "/og/information-default.png"
-updatedAt: "2025-09-26"
+updatedAt: "2025-09-28"
+howto:
+  name: "Screen a COA for dilution or substitution"
+  steps:
+    - "Confirm the **lot/batch ID** on COA matches the label, packing list, and invoice."
+    - "Check **identity tests** are appropriate (e.g., FTIR/HPLC/GC-MS; no generic ‘meets spec’)."
+    - "Compare **assay/potency** vs. normal ranges for the botanical/compound."
+    - "Verify **impurity profile** (heavy metals, solvents) aligns with the declared origin/process."
+    - "Match **organoleptic** notes (color, odor) with a retained reference sample."
+    - "Spot-check with an **independent lab** for high-risk lanes or unusually low pricing."
+faqs:
+  - q: "What’s the most common fraud pattern?"
+    a: "Dilution (active % depressed with cheap filler) and species substitution (look-alike botanicals or analogs). Both are often paired with copied or tampered COAs."
+  - q: "Do QR-code COAs solve it?"
+    a: "They help with provenance but don’t replace independent identity testing or supplier qualification."
+  - q: "Which signals should trigger a third-party test?"
+    a: "Outlier price, urgent availability, vague COA methods, or a new supplier on a complex ingredient."
 ---
 
-<Callout type="tip">
-This guide focuses on **what matters in the real world**: evidence, risk, and clear acceptance criteria.
-</Callout>
+## What “dilution” looks like
 
-## What you'll learn
-- Why this topic matters for sourcing and quality
-- What documents/evidence to request
-- Minimum acceptance criteria (with examples)
+- **Potency below market norms** but just inside a broad spec.
+- **Excipient fingerprint** (e.g., maltodextrin) not declared but visible in chromatograms.
+- **Density/solubility changes** vs. true material.
 
-## Key definitions
-- *Term 1* — buyer-friendly definition.
-- *Term 2* — concise definition.
+**Quick check:** ask for **raw instrument output** (chromatograms/spectra), not only summary values.
 
-## Checklist
-- [ ] Required documents collected
-- [ ] COA fields present (lot #, method refs, criteria, results)
-- [ ] Identity + spec matched
-- [ ] Red flags reviewed
+## What “substitution” looks like
 
-## How to do it
-1. **Request** baseline docs from the supplier.
-2. **Verify** legal entity & facility details.
-3. **Review** COA vs acceptance criteria.
-4. **Escalate** any mismatches or missing method references.
+- **Botanical swaps** within a genus (cheaper chemotype).
+- **Synthetic analogs** in place of natural actives.
+- **Incorrect salt forms** (e.g., Mg chelates vs. oxide).
 
-## Red flags
-- Missing method references
-- Results without acceptance criteria
-- Inconsistent lot/date metadata
+**Quick check:** require **fit-for-purpose identity methods** (e.g., DNA/barcoding for botanicals, chiral/marker testing for actives).
 
-## FAQ
-**Q:** What if the supplier won't share recent COAs?  
-**A:** Ask for anonymized COAs or third-party lab proof. No evidence = unacceptable risk.
+## COA tampering patterns
+
+- Cropped pages, inconsistent fonts, missing lab address/accreditation (ISO/IEC 17025).
+- Stale **report dates** vs. harvest/manufacture dates.
+- Same COA reused across lots.
+
+> Tip: keep a **COA library** and hash PDFs; duplicates across suppliers pop out fast.
+
+## Controls that actually work
+
+- **Approved methods table** per ingredient (which identity/assay is acceptable).
+- **AQL sampling** + periodic **3rd-party re-test** for high-risk SKUs.
+- **Supplier scorecards**: audit history, CAPAs closed, lot-to-lot variability.
+
+## Red flags at purchase
+
+- Price >15–20% below your rolling average.
+- Vendor pushes pre-paid only, won’t release full COA package.
+- “Proprietary method” but no validation summary.
+
+---
+
+### Templates you can copy
+
+**PO/Contract language (excerpt)**
+
+> Supplier warrants identity and assay per attached specification. Buyer may verify with independent ISO/IEC 17025 lab; failures trigger full refund, return rights, and documented CAPA within 10 business days.
+
+**COA request checklist**
+
+- Method & instrument model  
+- LOD/LOQ & uncertainty  
+- Sample chain-of-custody  
+- Analyst name & lab accreditation
+
+---
+
+### Related guides
+
+- [/information/verification-trust-guide](/information/verification-trust-guide)  
+- [/information/lab-testing-quality-guide](/information/lab-testing-quality-guide)
