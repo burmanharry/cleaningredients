@@ -10,24 +10,24 @@ type PostMeta = {
   updatedAt?: string;
 };
 
-const ROOT = path.join(process.cwd(), "content", "information");
+// READ posts from here:
+const INFO_DIR = path.join(process.cwd(), "content", "information");
+// WRITE category intros here:
+const CATS_DIR = path.join(process.cwd(), "content", "categories");
 
-// Very small front-matter parser (no deps). Expects leading --- ... ---.
+// Very small front-matter parser (no deps)
 function parseFrontmatter(src: string): { meta: Record<string, string>; body: string } {
   if (!src.startsWith("---")) return { meta: {}, body: src };
   const end = src.indexOf("\n---", 3);
   if (end === -1) return { meta: {}, body: src };
-
   const raw = src.slice(3, end).trim();
   const body = src.slice(end + 4).replace(/^\s*\n/, "");
   const meta: Record<string, string> = {};
-
   for (const line of raw.split("\n")) {
     const m = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
     if (!m) continue;
     const key = m[1].trim();
     let val = m[2].trim();
-    // strip surrounding quotes
     if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1);
     }
@@ -45,17 +45,16 @@ function slugify(s: string) {
 }
 
 async function listContent(): Promise<PostMeta[]> {
-  const files = await fs.readdir(ROOT, { withFileTypes: true });
-  const mdxFiles = files.filter(f => f.isFile() && f.name.endsWith(".mdx"));
+  const files = await fs.readdir(INFO_DIR, { withFileTypes: true });
+  const mdxFiles = files.filter((f) => f.isFile() && f.name.endsWith(".mdx"));
 
   const out: PostMeta[] = [];
   for (const f of mdxFiles) {
-    const full = path.join(ROOT, f.name);
+    const full = path.join(INFO_DIR, f.name);
     const raw = await fs.readFile(full, "utf8");
     const { meta } = parseFrontmatter(raw);
-    const slug = f.name.replace(/\.mdx$/, "");
     out.push({
-      slug,
+      slug: f.name.replace(/\.mdx$/, ""),
       title: meta.title,
       description: meta.description,
       category: meta.category,
@@ -65,17 +64,16 @@ async function listContent(): Promise<PostMeta[]> {
   return out;
 }
 
+// NOTE: NO "-guide" here; your loader slugifies the category name itself
 function pillarFilenameFor(category: string) {
-  // e.g. "Verification & Trust" -> "verification-trust-guide.mdx"
-  return `${slugify(category)}-guide.mdx`;
+  return `${slugify(category)}.mdx`;
 }
 
 function pillarTitleFor(category: string) {
-  return `${category}: Complete Guide`;
+  return `${category} Guide`;
 }
 
 function buildPillarMDX(category: string, posts: PostMeta[]) {
-  // Sort posts by updatedAt desc (fallback to name)
   posts.sort((a, b) => {
     const da = a.updatedAt ? Date.parse(a.updatedAt) : 0;
     const db = b.updatedAt ? Date.parse(b.updatedAt) : 0;
@@ -85,23 +83,25 @@ function buildPillarMDX(category: string, posts: PostMeta[]) {
 
   const updated = new Date().toISOString().slice(0, 10);
 
-  const items = posts.map(p => {
-    const line1 = `- [${p.title ?? p.slug}](/information/${p.slug})`;
-    const line2 = p.description ? `  \n  ${p.description}` : "";
-    return `${line1}${line2}`;
-  }).join("\n");
+  const items = posts
+    .map((p) => {
+      const line1 = `- [${p.title ?? p.slug}](/information/${p.slug})`;
+      const line2 = p.description ? `  \n  ${p.description}` : "";
+      return `${line1}${line2}`;
+    })
+    .join("\n");
 
   return `---
 title: "${pillarTitleFor(category)}"
-description: "Authoritative hub for ${category.toLowerCase()} — curated guides, checklists, and definitions."
+description: "Curated resources for ${category} — start here, then explore focused guides."
 category: "${category}"
 tags: ["pillar","evergreen"]
 updatedAt: "${updated}"
 ---
 
-<Callout type="tip">
+<callout type="tip">
 This page is the **hub** for ${category.toLowerCase()}. Start here, then dive into the focused guides below.
-</Callout>
+</callout>
 
 ## Recommended reading
 
@@ -136,17 +136,16 @@ async function main() {
     return;
   }
 
-  await fs.mkdir(ROOT, { recursive: true });
+  await fs.mkdir(CATS_DIR, { recursive: true });
 
   let created = 0;
   for (const [category, items] of groups) {
     const filename = pillarFilenameFor(category);
-    const full = path.join(ROOT, filename);
+    const full = path.join(CATS_DIR, filename);
 
-    // If a pillar already exists, skip (so you can hand-edit later)
     try {
       await fs.access(full);
-      console.log(`Skip (exists): ${filename}`);
+      console.log(`Skip (exists): ${path.relative(process.cwd(), full)}`);
       continue;
     } catch {
       // not found — create it
