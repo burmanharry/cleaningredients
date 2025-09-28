@@ -1,0 +1,178 @@
+---
+title: "How do we verify ingredient suppliers?"
+description: "Step-by-step verification workflow, the documents to request, how to review COAs, and clear acceptance criteria."
+category: "Verification & Trust"
+tags: ["verification", "supplier", "due-diligence", "onboarding", "risk"]
+author: "harry-burman"         # 👈 matches key in AUTHORS
+image: "/og/information-default.png"
+updatedAt: "2025-09-26"
+
+faqs:
+  - q: "What documents do I need from a supplier?"
+    a: "Legal entity docs, facility certifications (e.g., cGMP), and a lot-specific COA."
+  - q: "How do I confirm a COA is legitimate?"
+    a: "Contact the lab directly or verify via their portal; match sample ID, method, and date."
+
+howto:
+  name: "Verify a new ingredient supplier"
+  steps:
+    - "Collect legal entity docs and facility certificates."
+    - "Obtain a lot-specific COA and verify with the lab."
+    - "Check identity/potency, heavy metals, micro, and solvents as applicable."
+    - "Confirm traceability and logistics (incoterms, lead times)."
+---
+
+<Callout type="tip">
+Verification is about **evidence**. Collect documents that tie back to the **legal entity** and the **facility** making or handling the product, then confirm that batch-level results meet your acceptance criteria.
+</Callout>
+
+## What you'll learn
+- The baseline document set to request from any supplier
+- How to review a COA (and what “good” looks like)
+- A quick scoring rubric to triage risk
+- Red flags and escalation paths
+
+---
+
+## 1) Prove the **legal entity**
+Ask for documents that establish who you’re dealing with.
+
+**Request**
+- Legal entity name and **registered address**
+- Government business registration (or equivalent) with registration number
+- Primary domain email (avoid new, generic free-mail accounts)
+- Point-of-contact name and role
+
+**Checks**
+- Names and addresses match across all documents and email signatures  
+- Company website and email domain are consistent (e.g., `@supplier.com`, not `@mail.com`)
+
+---
+
+## 2) Confirm the **facility**
+You want evidence for the physical site that manufactures, packs, or stores your lot.
+
+**Request**
+- Facility address (street, city, country)  
+- Scope of activities (manufacture / extraction / packing / storage)  
+- Utility: basic floorplan or flow diagram (optional but helpful)
+
+**Checks**
+- Facility address appears on certificates and COAs where appropriate  
+- If a trader/broker is involved, capture **chain of custody** (see §5)
+
+---
+
+## 3) Snapshot the **quality system**
+You’re not auditing—just establishing baseline controls.
+
+**Request**
+- Current certifications (e.g., **cGMP**, **ISO22000**, **Organic**, **Kosher/Halal** where relevant)  
+- Date of last 3rd-party audit (provide summary letter if available)  
+- SOP index or list of key procedures (receiving, testing, release, complaints/recalls)
+
+**Checks**
+- Certificates are **in-date**, match the **entity**/**facility**, and cover the **scope** you buy
+
+---
+
+## 4) Gather **product-level** documents
+You need evidence that the item you’ll buy matches your spec.
+
+**Request**
+- **Product specification** (identity tests, acceptance criteria, microbial/heavy metals limits, moisture, actives, etc.)  
+- **Safety & compliance**: SDS, allergen/GMO/irradiation statements as applicable  
+- **Recent COAs** (see §6) — ask for **three** from different lots if possible
+
+**Checks**
+- Spec includes **methods or references** (e.g., HPLC, ICP-MS, FTIR; USP/Ph.Eur./in-house method IDs)  
+- Acceptance criteria are numeric and unambiguous
+
+---
+
+## 5) Map **chain of custody** (when not buying direct from the manufacturer)
+If a trader or distributor supplies you, capture the lineage.
+
+**Request**
+- Manufacturer legal entity & facility address  
+- Documentation showing the product moves from manufacturer → trader → you  
+- If repackaged, include repack site address and labels with **lot numbers**
+
+**Checks**
+- Lot numbers and product names stay consistent through documents  
+- Everyone in the chain is identified
+
+---
+
+## 6) Review the **COA** (Certificate of Analysis)
+A usable COA contains enough detail for an independent reviewer to reproduce the conclusion.
+
+**Minimum fields**
+- Product name, **lot/batch number**, manufacturing or sampling date  
+- **Test methods** (e.g., “HPLC, in-house method QP-HPLC-102”, or “USP &lt;561&gt;”)
+- **Acceptance criteria** and **results** for each analyte/test  
+- Tested by (lab name), location, and authorized signature (digital is fine)
+
+**Quick read**
+- Methods referenced? ✅  
+- Results vs criteria clearly shown? ✅  
+- Microbial/metals/identity present as applicable? ✅  
+- Dates make sense (no post-dated signatures, no impossible timelines)
+
+<Callout type="warn">
+If **method references are missing**, or results are listed without **acceptance criteria**, stop and request an updated COA.
+</Callout>
+
+---
+
+## 7) Acceptance criteria (buyer baseline)
+Use or adapt the following as your go/no-go:
+
+- ✅ Entity & facility identified and consistent across docs  
+- ✅ At least one **current** quality certificate covering the relevant scope  
+- ✅ Product spec with **explicit methods** and **criteria**  
+- ✅ COA(s) include lot number, dated signature, **method references**, criteria, and results  
+- ✅ Results meet criteria; no data manipulation (e.g., rounded to pass)  
+- ✅ If applicable, chain of custody established
+
+---
+
+## 8) Red flags (escalate or reject)
+- COAs with identical results across multiple “different” lots  
+- Certificates that don’t match the entity/facility or are expired  
+- Free-mail domains only; no company domain; evasive on facility details  
+- COA missing methods or acceptance criteria  
+- Lot or date info inconsistent across documents  
+- Unwillingness to provide **any** prior COAs
+
+---
+
+## 9) Lightweight **risk score**
+Use this to triage suppliers quickly (0=poor, 3=excellent).
+
+| Area | 0 | 1 | 2 | 3 |
+| --- | --- | --- | --- | --- |
+| Documents completeness | Bare | Partial | Most | Full set |
+| Evidence quality | Vague | Some methods | Clear methods | Validated/standard |
+| Consistency over time | None | 1 COA | 2 COAs | 3+ COAs |
+| Integrity signals | Issues | Minor gaps | Clean | Strong
+
+**Pass** if total ≥ 8 and no red flags. Otherwise **escalate** (request more evidence or run third-party testing).
+
+---
+
+## 10) Supplier email template (copy/paste)
+```text
+Subject: Evidence request for <Ingredient> — <Your Company>
+
+Hello <Name>,
+
+To complete onboarding for <Ingredient>, please share:
+1) Legal entity and facility address
+2) Current quality certificates (cGMP/ISO/Organic/etc.)
+3) Product specification (methods + acceptance criteria)
+4) COAs for recent lots (ideally 2–3), with method references
+5) Any applicable statements (allergen/GMO/irradiation)
+
+Thank you,
+<Your Name>

@@ -6,7 +6,6 @@ import BuyBox from "@/components/BuyBox";
 import SpecTable from "@/components/SpecTable";
 
 const PLACEHOLDER_PRICE = 10; // temp price per kg
-
 export const revalidate = 300;
 
 export default async function IngredientPage(
@@ -84,7 +83,7 @@ export default async function IngredientPage(
 
         <aside className="lg:col-span-5 space-y-4">
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            {ing.name}
+        
           </h1>
 
           <div className="flex items-center gap-2 text-sm">
@@ -105,6 +104,8 @@ export default async function IngredientPage(
             ingredientId={ing.id}
             ingredientName={ing.name}
             isPlaceholder={isPlaceholder}
+            // If you already fetch real Stripe prices for this ingredient,
+            // pass them here as `prices` to enable the “Add to cart & Pay” flow.
           />
         </aside>
       </div>

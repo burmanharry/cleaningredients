@@ -1,18 +1,14 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    './app/**/*.{ts,tsx,js,jsx,mdx}',
-    './components/**/*.{ts,tsx,js,jsx,mdx}',
-    './pages/**/*.{ts,tsx,js,jsx,mdx}',
+    "./app/**/*.{ts,tsx,mdx}",
+    "./components/**/*.{ts,tsx,mdx}",
+    "./content/**/*.{md,mdx}", // <= include MDX files
   ],
   theme: {
-    extend: {
-      borderRadius: {
-        DEFAULT: '12px',
-      },
-    },
+    extend: {},
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")], // <= pretty prose
 };
 export default config;

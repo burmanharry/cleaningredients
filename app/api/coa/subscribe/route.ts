@@ -1,32 +1,46 @@
+// app/api/coa/subscribe/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { sendScanReportEmail } from "@/lib/email";
+import { Resend } from "resend";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const runtime = "nodejs";
+// (Optional) ensure this route is always dynamic
+// export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const { email } = await req.json().catch(() => ({} as any));
+
+  if (!email || !/\S+@\S+\.\S+$/.test(email)) {
+    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    // Don’t break builds or local runs if email isn’t configured yet.
+    console.warn("[/api/coa/subscribe] RESEND_API_KEY missing; skipping email.");
+    return NextResponse.json({ ok: true, skipped: true });
+  }
+
+  const resend = new Resend(apiKey);
+
   try {
-    const { token, email } = await req.json();
-    if (!token || !email) return NextResponse.json({ error: "token and email required" }, { status: 400 });
-    if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "invalid email" }, { status: 400 });
+    // If you use an audience/list in Resend, set RESEND_AUDIENCE_ID
+    const audienceId = process.env.RESEND_AUDIENCE_ID;
+    if (audienceId) {
+      await resend.contacts.create({ email, audienceId });
+    }
 
-    // Call token-scoped RPC with anon client
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    const { data, error } = await supabase.rpc("claim_submission_email", {
-      p_token: token, p_email: email,
+    // Optional: send a confirmation email
+    const from = process.env.RESEND_FROM || "CleanIngredients <noreply@cleaningredients.co>";
+    await resend.emails.send({
+      from,
+      to: email,
+      subject: "Thanks for subscribing",
+      text: "You're on the list. We'll share new verification & supplier posts as they go live.",
     });
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-    if (!data) return NextResponse.json({ error: "invalid token" }, { status: 404 });
-
-    // fire-and-forget email (await to surface errors during dev)
-    await sendScanReportEmail(email, token);
 
     return NextResponse.json({ ok: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "unexpected error" }, { status: 500 });
+  } catch (err: any) {
+    console.error("[/api/coa/subscribe] Resend error:", err?.message || err);
+    return NextResponse.json({ error: "Email failed" }, { status: 500 });
   }
 }

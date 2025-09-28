@@ -51,7 +51,11 @@ export default function Header() {
           {/* Desktop nav */}
           <nav className="hidden items-center gap-6 text-base sm:flex">
             <Link href="/ingredients" className="hover:underline">
-              Browse
+              Ingredients
+            </Link>
+            {/* NEW: COA Scan */}
+            <Link href="/coa-scan" className="hover:underline">
+              COA Scan
             </Link>
             <Link href="/information" className="hover:underline">
               Information
@@ -59,10 +63,7 @@ export default function Header() {
             <Link href="/FAQ" className="hover:underline">
               FAQ
             </Link>
-            {/* NEW: COA Scan */}
-            <Link href="/coa-scan" className="hover:underline">
-              COA Scan
-            </Link>
+            
           </nav>
 
           <div className="flex items-center gap-3">

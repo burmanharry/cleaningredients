@@ -12,7 +12,7 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const GENERAL_SECTIONS: { category: string; items: string[] }[] = [
+export const GENERAL_SECTIONS: { category: string; items: string[] }[] = [
   {
     category: "Verification & Trust",
     items: [
